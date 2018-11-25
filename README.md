@@ -1,3 +1,4 @@
+ONLY DOWNLOAD "main.go"
 # folder_analyser
 The program only works with a single parameter "go run main.go $1stParameter" Where $1stParameter is an absolute path. 
 Example(In UNIX):
