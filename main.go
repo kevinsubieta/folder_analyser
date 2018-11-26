@@ -4,32 +4,46 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"encoding/json"
+	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 )
 
-func main() {
-	if len(os.Args) != 2 {
-		fmt.Println("Missing parameter, provide file path!")
-		return
-	}
-	//getDocuments("/Users/ericksubieta/Documents/Gestión_Documental/Nibol/Recursos/TestGo/")
-	getDocuments(os.Args[1])
+
+//Document struct
+type Document struct {
+	ID   string
+	Name string
+	Size int64
 }
 
-func getDocuments(dir string) {
-	fileInfos, err := ioutil.ReadDir(dir)
+func main() {
+	router := mux.NewRouter()
+	router.HandleFunc("/documents", getDocuments).Methods("GET")
+	log.Fatal(http.ListenAndServe(":9000", router))
+}
+
+func getDocuments(w http.ResponseWriter, r *http.Request) {
+	var docs []Document
+	fileDir := "./FileToTest/"
+	fileInfos, err := ioutil.ReadDir(fileDir)
 	if err != nil {
 		fmt.Println("Error in accessing directory:", err)
 	}
 
 	for _, file := range fileInfos {
-		hash, err := hashFileToMD5CheckSum(dir + "/" + file.Name())
+		fileHash, err := hashFileToMD5CheckSum(fileDir + "/" + file.Name())
 		if err == nil {
-			fmt.Printf("MD5: %s  -  Name: %s  -  Size: %d Kbps \n", hash, file.Name(), file.Size())
+			docs = append(docs, Document{ID: fileHash, Name: file.Name(), Size: file.Size()})
+			fmt.Printf("MD5: %s  -  Name: %s  -  Size: %d Kbps \n", fileHash, file.Name(), file.Size())
 		}
 	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(docs)
 }
 
 
