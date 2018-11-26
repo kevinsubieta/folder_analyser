@@ -1,4 +1,3 @@
-ONLY DOWNLOAD "main.go"
 # folder_analyser
 The program only works with a single filedir into the project called "FileToTest", the program analize and show in the navegator "Id of the files represented like MD5", "Name of the file" and "Size of the file"
 
